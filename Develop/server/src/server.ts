@@ -30,9 +30,9 @@ app.use(express.static(path.resolve(__dirname, '../../client/dist')));
 // TODO: Fix missing index.html serving logic
 app.get('*', (_req, res) => {
     res.sendFile(path.resolve(__dirname, '../../client/dist/index.html'));
-  });
+});
 
 // TODO: Start the server and confirm it's running
 app.listen(PORT, () => {
-  console.log(`🌍 Server running at http://localhost:${PORT}`);
+    console.log(`🌍 Server running at http://localhost:${PORT}`);
 });

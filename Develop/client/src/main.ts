@@ -2,21 +2,25 @@ import './styles/jass.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // * Selección de elementos del DOM
-const searchForm = document.getElementById('search-form') as HTMLFormElement;
-const searchInput = document.getElementById('search-input') as HTMLInputElement;
+const searchForm = document.getElementById('search-form') as HTMLFormElement | null;
+const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
 const searchHistoryContainer = document.getElementById('history') as HTMLDivElement | null;
-const heading = document.getElementById('search-title') as HTMLHeadingElement;
-const weatherIcon = document.getElementById('weather-img') as HTMLImageElement;
-const tempEl = document.getElementById('temp') as HTMLParagraphElement;
-const windEl = document.getElementById('wind') as HTMLParagraphElement;
-const humidityEl = document.getElementById('humidity') as HTMLParagraphElement;
+const heading = document.getElementById('search-title') as HTMLHeadingElement | null;
+const weatherIcon = document.getElementById('weather-img') as HTMLImageElement | null;
+const tempEl = document.getElementById('temp') as HTMLParagraphElement | null;
+const windEl = document.getElementById('wind') as HTMLParagraphElement | null;
+const humidityEl = document.getElementById('humidity') as HTMLParagraphElement | null;
+console.log("📡 Backend URL:", import.meta.env.VITE_BACKEND_URL);
+
 
 /*
 API Calls
 */
 const fetchWeather = async (cityName: string) => {
   try {
-    const response = await fetch('/api/weather/', {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+    const response = await fetch(`${backendUrl}/api/weather/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: cityName }),
@@ -46,7 +50,9 @@ const fetchSearchHistory = async (): Promise<{ name: string; id: string }[]> => 
   try {
     console.log("📥 Fetching search history...");
 
-    const response = await fetch('/api/weather/history', {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+    const response = await fetch(`${backendUrl}/api/weather/history`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -73,18 +79,20 @@ const renderCurrentWeather = (currentWeather: any): void => {
 
   const { city, date, icon, description, temperature, windSpeed, humidity } = currentWeather;
 
-  heading.innerHTML = `<strong>${city} (${date})</strong>`;
-  const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+  if (heading && weatherIcon && tempEl && windEl && humidityEl) {
+    heading.innerHTML = `<strong>${city} (${date})</strong>`;
+    const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
 
-  console.log("Icon URL (current weather):", iconUrl);
+    console.log("Icon URL (current weather):", iconUrl);
 
-  weatherIcon.setAttribute('src', iconUrl);
-  weatherIcon.setAttribute('alt', description);
-  weatherIcon.setAttribute('class', 'weather-img');
+    weatherIcon.setAttribute('src', iconUrl);
+    weatherIcon.setAttribute('alt', description);
+    weatherIcon.setAttribute('class', 'weather-img');
 
-  tempEl.textContent = `Temp: ${temperature}°C`;
-  windEl.textContent = `Wind: ${windSpeed} MPH`;
-  humidityEl.textContent = `Humidity: ${humidity} %`;
+    tempEl.textContent = `Temp: ${temperature}°C`;
+    windEl.textContent = `Wind: ${windSpeed} MPH`;
+    humidityEl.textContent = `Humidity: ${humidity} %`;
+  }
 };
 
 const renderForecast = (forecast: any[]): void => {
@@ -153,11 +161,19 @@ const renderForecastCard = (forecast: any): HTMLDivElement => {
   weatherIcon.setAttribute("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
   weatherIcon.setAttribute("alt", description);
 
-  tempEl.textContent = `Temp: ${temperature} °F`;
+  tempEl.textContent = `Temp: ${Math.round(temperature)}°F`;
   windEl.textContent = `Wind: ${windSpeed} MPH`;
   humidityEl.textContent = `Humidity: ${humidity} %`;
 
   return col;
+};
+
+/*
+Función para renderizar historial
+*/
+const getAndRenderHistory = async () => {
+  console.log("🔄 Ejecutando getAndRenderHistory...");
+  await renderSearchHistory();
 };
 
 /*
@@ -169,8 +185,8 @@ const renderSearchHistory = async () => {
     return;
   }
 
-  searchHistoryContainer.style.display = "block"; // Asegurar que sea visible
-  searchHistoryContainer.innerHTML = ''; // Limpia antes de agregar
+  searchHistoryContainer.style.display = "block"; 
+  searchHistoryContainer.innerHTML = ''; 
 
   const historyList = await fetchSearchHistory();
   console.log("🔎 Search History Data received in frontend:", historyList);
@@ -195,19 +211,11 @@ const renderSearchHistory = async () => {
 };
 
 /*
-Función para renderizar historial
-*/
-const getAndRenderHistory = async () => {
-  console.log("🔄 Ejecutando getAndRenderHistory...");
-  await renderSearchHistory();
-};
-
-/*
 Event Handlers
 */
 const handleSearchFormSubmit = async (event: Event) => {
   event.preventDefault();
-  if (!searchInput.value.trim()) return;
+  if (!searchInput || !searchInput.value.trim()) return;
 
   await fetchWeather(searchInput.value.trim());
   await getAndRenderHistory();
@@ -223,4 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
   getAndRenderHistory();
 });
 
-searchForm.addEventListener('submit', handleSearchFormSubmit);
+if (searchForm) {
+  searchForm.addEventListener('submit', handleSearchFormSubmit);
+}
