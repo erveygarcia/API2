@@ -7,7 +7,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
       },
@@ -17,4 +17,7 @@ export default defineConfig({
     outDir: 'dist', // Guarda los archivos en `dist/`
     emptyOutDir: true, // Borra el contenido anterior de `dist/`
   },
+  define: {
+    'import.meta.env.VITE_BACKEND_URL': JSON.stringify(process.env.VITE_BACKEND_URL || 'http://localhost:3001')
+  }
 });
