@@ -51,7 +51,8 @@ const fetchSearchHistory = async (): Promise<{ name: string; id: string }[]> => 
     console.log("📥 Fetching search history...");
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    console.log("Backend URL:",backendUrl);
+    console.log("📡 Backend URL:", backendUrl);
+    
     
 
     const response = await fetch(`${backendUrl}/api/weather/history`, {
