@@ -1,23 +1,23 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './', // 🔥 Esto hace que los archivos se sirvan con rutas relativas
+  base: './',
   server: {
     port: 3000,
     open: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_BACKEND_URL || 'http://localhost:3001',
+        target: process.env.VITE_BACKEND_URL, // ⚠️ Eliminamos fallback a localhost
         changeOrigin: true,
         secure: false,
       },
     },
   },
   build: {
-    outDir: 'dist', // Guarda los archivos en `dist/`
-    emptyOutDir: true, // Borra el contenido anterior de `dist/`
+    outDir: 'dist',
+    emptyOutDir: true,
   },
   define: {
-    'import.meta.env.VITE_BACKEND_URL': JSON.stringify(process.env.VITE_BACKEND_URL || 'http://localhost:3001')
+    'import.meta.env.VITE_BACKEND_URL': JSON.stringify(process.env.VITE_BACKEND_URL) // ⚠️ Eliminamos fallback a localhost
   }
 });
