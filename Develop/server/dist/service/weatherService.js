@@ -3,6 +3,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 console.log("API Key:", process.env.OPENWEATHER_API_KEY);
 class Weather {
+    city;
+    temperature;
+    windSpeed;
+    humidity;
+    description;
+    icon;
+    date;
     constructor(city, temperature, windSpeed, humidity, description, icon, date) {
         this.city = city;
         this.temperature = temperature;
@@ -14,11 +21,9 @@ class Weather {
     }
 }
 class WeatherService {
-    constructor() {
-        this.baseURL = 'https://api.openweathermap.org/data/2.5/forecast';
-        this.geoBaseURL = 'http://api.openweathermap.org/geo/1.0/direct';
-        this.apiKey = process.env.OPENWEATHER_API_KEY;
-    }
+    baseURL = 'https://api.openweathermap.org/data/2.5/forecast';
+    geoBaseURL = 'http://api.openweathermap.org/geo/1.0/direct';
+    apiKey = process.env.OPENWEATHER_API_KEY;
     async fetchLocationData(city) {
         try {
             const geoResponse = await axios.get(`${this.geoBaseURL}?q=${city}&limit=1&appid=${this.apiKey}`);

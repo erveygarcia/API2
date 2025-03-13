@@ -4,26 +4,30 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 dotenv.config();
-// TODO: Fix missing dependency error for CORS (install with npm install cors)
+// Importar rutas de la API
 import weatherRoutes from './routes/api/weatherRoutes.js';
 const app = express();
-const PORT = process.env.PORT || 3001;
-// TODO: Fix '__dirname is not defined' issue for ES Modules
+const PORT = process.env.PORT || 10000;
+// Corregir '__dirname' en módulos ES
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// TODO: Implement middleware for parsing JSON and urlencoded form data
+// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// TODO: Implement middleware to connect the routes
+// Rutas API
 app.use('/api/weather', weatherRoutes);
-// TODO: Serve frontend static files
-app.use(express.static(path.resolve(__dirname, '../../client/dist')));
-// TODO: Fix missing index.html serving logic
-app.get('*', (_req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../client/dist/index.html'));
+// Servir frontend desde 'client/dist'
+const frontendPath = path.join(process.cwd(), '../client/dist');
+app.use(express.static(frontendPath));
+// Evitar que las rutas de la API devuelvan `index.html`
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: "API route not found" });
+    }
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
-// TODO: Start the server and confirm it's running
+// Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`🌍 Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });

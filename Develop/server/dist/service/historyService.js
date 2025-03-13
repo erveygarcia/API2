@@ -10,6 +10,8 @@ const __dirname = path.dirname(__filename);
 const HISTORY_FILE = path.join(__dirname, '..', '..', 'db', 'searchHistory.json');
 // TODO: Define a City class with name and id properties
 class City {
+    id;
+    name;
     constructor(id, name) {
         this.id = id;
         this.name = name;
