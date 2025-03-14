@@ -12,11 +12,18 @@ const PORT = process.env.PORT || 3001;
 // 🔥 Habilitar CORS correctamente
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://weather-challenge-qfmv.onrender.com";
 
-app.use(cors({
+const corsOptions = {
     origin: FRONTEND_URL,
-    methods: "GET,POST,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization"
-}));
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true // Habilitar credenciales si es necesario
+};
+
+app.use(cors(corsOptions));
+
+// 🔥 IMPORTANTE: Asegurar que las preflight requests (`OPTIONS`) son manejadas correctamente
+app.options("*", cors(corsOptions));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
