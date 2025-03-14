@@ -10,8 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 🔥 Habilitar CORS correctamente
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://weather-challenge-qfmv.onrender.com";
+
 app.use(cors({
-    origin: "*", // 🔥 Permitir solicitudes desde cualquier origen
+    origin: FRONTEND_URL,
     methods: "GET,POST,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization"
 }));
@@ -35,4 +37,7 @@ app.get('*', (_req, res) => {
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
+});
+app.get("/api/test", (_req, res) => {
+    res.json({ message: "Backend funcionando correctamente 🚀" });
 });
