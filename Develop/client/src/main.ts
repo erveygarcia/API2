@@ -10,17 +10,13 @@ const weatherIcon = document.getElementById('weather-img') as HTMLImageElement |
 const tempEl = document.getElementById('temp') as HTMLParagraphElement | null;
 const windEl = document.getElementById('wind') as HTMLParagraphElement | null;
 const humidityEl = document.getElementById('humidity') as HTMLParagraphElement | null;
-console.log("📡 Backend URL:", import.meta.env.VITE_BACKEND_URL);
-
 
 /*
 API Calls
 */
 const fetchWeather = async (cityName: string) => {
   try {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-    const response = await fetch(`${backendUrl}/api/weather/`, {
+    const response = await fetch(`/api/weather/`, {  // ✅ Ruta relativa
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: cityName }),
@@ -34,7 +30,6 @@ const fetchWeather = async (cityName: string) => {
     console.log('weatherData:', weatherData);
 
     if (!weatherData.current || !weatherData.forecast) {
-      console.error("Error: Respuesta del servidor inválida", weatherData);
       throw new Error("Invalid weather data from server");
     }
 
@@ -50,12 +45,7 @@ const fetchSearchHistory = async (): Promise<{ name: string; id: string }[]> => 
   try {
     console.log("📥 Fetching search history...");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    console.log("📡 Backend URL:", backendUrl);
-    
-    
-
-    const response = await fetch(`${backendUrl}/api/weather/history`, {
+    const response = await fetch(`/api/weather/history`, {  // ✅ Ruta relativa
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -213,27 +203,19 @@ const renderSearchHistory = async () => {
   console.log("✅ Search history rendered successfully!");
 };
 
-/*
-Event Handlers
-*/
-const handleSearchFormSubmit = async (event: Event) => {
-  event.preventDefault();
-  if (!searchInput || !searchInput.value.trim()) return;
-
-  await fetchWeather(searchInput.value.trim());
-  await getAndRenderHistory();
-
-  searchInput.value = '';
-};
-
-/*
-Asegurar que el historial se renderiza al cargar la página
-*/
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ DOM cargado. Ejecutando getAndRenderHistory()");
   getAndRenderHistory();
 });
 
 if (searchForm) {
-  searchForm.addEventListener('submit', handleSearchFormSubmit);
+  searchForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!searchInput || !searchInput.value.trim()) return;
+
+    await fetchWeather(searchInput.value.trim());
+    await getAndRenderHistory();
+
+    searchInput.value = '';
+  });
 }

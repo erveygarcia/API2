@@ -9,30 +9,34 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// 🔥 Habilitar CORS correctamente
+// 🔥 Asegurar que FRONTEND_URL está definido
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://weather-challenge-qfmv.onrender.com";
+console.log(`🔧 Configurando CORS para: ${FRONTEND_URL}`);
 
+// 🔥 Configuración correcta de CORS
 const corsOptions = {
     origin: FRONTEND_URL,
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true // Habilitar credenciales si es necesario
+    credentials: true
 };
 
 app.use(cors(corsOptions));
-
-// 🔥 IMPORTANTE: Asegurar que las preflight requests (`OPTIONS`) son manejadas correctamente
-app.options("*", cors(corsOptions));
-
+app.options("*", cors(corsOptions)); // 🔥 Permitir preflight requests
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas API
+// 📡 Ruta de prueba para ver si el backend responde
+app.get("/api/test", (_req, res) => {
+    res.json({ message: "✅ Backend funcionando correctamente 🚀" });
+});
+
+// 📡 Rutas de la API
 import weatherRoutes from './routes/api/weatherRoutes.js';
 app.use('/api/weather', weatherRoutes);
 
-// Servir frontend estático
+// 🖥️ Servir el frontend estático
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.resolve(__dirname, '../../client/dist')));
@@ -41,10 +45,7 @@ app.get('*', (_req, res) => {
     res.sendFile(path.resolve(__dirname, '../../client/dist/index.html'));
 });
 
-// Iniciar servidor
+// 🚀 Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-});
-app.get("/api/test", (_req, res) => {
-    res.json({ message: "Backend funcionando correctamente 🚀" });
 });
